@@ -20,9 +20,9 @@ class MySqlQueryBuildService{
             die("Ошибка:" . $e->getMessage());
         }
     }
-    public function where(string $column, string $operator, string $value): array
+    public function where(string $column, string $operator, string $value, string $columns = "*"): array
     {
-        $stmt = $this->connection()->prepare("SELECT * FROM {$this->table} WHERE $column $operator ?");
+        $stmt = $this->connection()->prepare("SELECT $columns FROM {$this->table} WHERE $column $operator ?");
         $stmt->execute([$value]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
         

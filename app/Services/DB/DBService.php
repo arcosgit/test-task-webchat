@@ -2,7 +2,7 @@
 namespace App\Services\DB;
 /**
  * @method static self insert(array $params)
- * @method static self where(string $column, string $operator, string $value)
+ * @method static self where(string $column, string $operator, string $value, string $columns = "*")
  */
 class DBService{
     protected static string $table = "";
