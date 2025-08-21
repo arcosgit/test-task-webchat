@@ -2,11 +2,12 @@
 require __DIR__ . "/../vendor/autoload.php"; 
 
 use App\Models\User;
+use App\Models\UserToken;
 
 function store(){
     if(isset($_POST['login'], $_POST['email'], $_POST['password'], $_POST['password_confirm'])){
-        $tryFindEmail = User::where('email', '=', $_POST['email']);
-        $tryFindLogin = User::where('login', '=', $_POST['login']);
+        $tryFindEmail = User::where('email', '=', $_POST['email'])->get();
+        $tryFindLogin = User::where('login', '=', $_POST['login'])->get();
         if(count($tryFindLogin) > 0){
             $_GET['error_login'] = "Данный логин занят";
             return;
@@ -20,8 +21,15 @@ function store(){
             'email'=> $_POST['email'],
             'password'=> password_hash($_POST['password'], PASSWORD_DEFAULT),
         ]);
-        if($result){
-            setcookie("email", $_POST['email']);
+        if($result){            
+            $token = bin2hex(random_bytes(64));
+            $user = User::where("email", "=", $_POST['email'])->get();
+            UserToken::insert([
+                'user_id' => $user[0]['id'],
+                'token' => $token
+            ]);
+            setcookie("auth_token", $token);
+            setcookie("id", $user[0]['id']);
             header("Location: chats.php");
             exit();
         }
@@ -36,7 +44,10 @@ store();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Регистрация</title>
-    <link rel="stylesheet" href="/public/assets/css/auth.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/auth.css">
 </head>
 <body>
     <main>
@@ -58,11 +69,11 @@ store();
             <div class="form_error_password"></div>
             <div class="form_block">
                 <button type="submit" class="form_submit">Зарегистрироваться</button>
-                <a href="/public/index.php">Уже есть аккаунт</a>
+                <a href="index.php">Уже есть аккаунт</a>
             </div>
         </form>
     </main>
-    <script src="/public/assets/js/jquery-3.7.1.slim.min.js"></script>
+    <script src="assets/js/jquery-3.6.0.min.js"></script>
     <!-- <script src="/public/assets/js/registration.js"></script> -->
 </body>
 </html>

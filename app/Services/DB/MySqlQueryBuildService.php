@@ -6,7 +6,7 @@ use PDOException;
 
 class MySqlQueryBuildService{
     private string $query= "";
-    private string $queryParam = "";
+    private array $queryParam = [];
     public function __construct(private string $table = ""){}
     private function connection(): PDO{
         try{
@@ -20,20 +20,31 @@ class MySqlQueryBuildService{
             die("Ошибка:" . $e->getMessage());
         }
     }
-    public function where(string $column, string $operator, string $value, string $columns = "*"): array
+    public function where(string $column, string $operator, string $value, string $columns = "*"): self
     {
-        $stmt = $this->connection()->prepare("SELECT $columns FROM {$this->table} WHERE $column $operator ?");
-        $stmt->execute([$value]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
+        if($this->query == ""){
+            $sql = "SELECT $columns FROM {$this->table} WHERE $column $operator ? ";
+            $this->query .= $sql;
+            $this->queryParam[] = $value;
+        } else {
+            $sql = "AND $column $operator ? ";
+            $this->query .= $sql;
+            $this->queryParam[] = $value;
+        }
+        return $this;
     }
-    public function insert(array $params)
+
+    public function whereOr(string $column, string $operator, string $value): self
+    {
+        $sql = "OR $column $operator ? ";
+        $this->query .= $sql;
+        $this->queryParam[] = $value;
+        return $this;
+    }
+    public function insert(array $params): bool
     {
         $keys = implode(", ", array_keys($params));
-        $prepareValues = [];
-        foreach ($params as $item) {
-            array_push($prepareValues, "?");
-        }
+        $prepareValues = array_fill(0, count($params), "?");
         try{
             $stmt = $this->connection()->prepare("INSERT INTO {$this->table} ($keys) VALUES (" . implode(", ", $prepareValues) . ")");
             $stmt->execute(array_values($params));
@@ -41,5 +52,19 @@ class MySqlQueryBuildService{
         } catch(PDOException $e){
             die($e->getMessage());
         }
+    }
+
+    public function delete(string $column, string $operator, string $value): bool
+    {
+        $stmt = $this->connection()->prepare("DELETE FROM {$this->table} WHERE $column $operator ?");
+        $stmt->execute([$value]);
+        return true;
+    }
+
+    public function get()
+    {
+        $stmt = $this->connection()->prepare($this->query);
+        $stmt->execute($this->queryParam);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
