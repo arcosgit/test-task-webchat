@@ -19,9 +19,9 @@ function auth(){
                 'user_id' => $user[0]['id'],
                 'token' => $token
             ]);
-            setcookie("auth_token", $token);
-            setcookie("id", $user[0]['id']);
-            setcookie("login", $user[0]['login']);
+            $_SESSION['auth_token'] = $token;
+            $_SESSION['id'] = $user[0]['id'];
+            $_SESSION['login'] = $user[0]['login'];
             header("Location: chats.php");
             exit();
         } else {

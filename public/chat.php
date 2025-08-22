@@ -1,13 +1,14 @@
 <?php
+session_start();
 require __DIR__ . "/../vendor/autoload.php";
 use App\Models\Chat;
-if(!isset($_GET['chatId']) || empty($_GET['chatId'])){
+if(!isset($_GET['chatId']) || empty($_GET['chatId'] || !isset($_SESSION['auth_token']))){
     header('Location: chats.php');
 }
 $chat = Chat::select('chats.id as chat_id, first_user_id, second_user_id, login')
         ->join('users', 'chats.first_user_id = users.id or chats.second_user_id = users.id')
         ->where("chats.id", "=", $_GET['chatId'])->get();
-if($chat[0]['first_user_id'] != $_COOKIE['id'] && $chat[0]['second_user_id'] != $_COOKIE['id']){
+if($chat[0]['first_user_id'] != $_SESSION['id'] && $chat[0]['second_user_id'] != $_SESSION['id']){
     header('Location: chats.php');
 }
 ?>
@@ -26,7 +27,7 @@ if($chat[0]['first_user_id'] != $_COOKIE['id'] && $chat[0]['second_user_id'] != 
 <body>
     <main>
         <div class="chat">
-            <div class="chat_upper_block">Чат с <?= $chat[0]['login'] == $_COOKIE['login'] ? $chat[1]['login'] : $chat[0]['login'] ?></div>
+            <div class="chat_upper_block">Чат с <?= $chat[0]['login'] == $_SESSION['login'] ? $chat[1]['login'] : $chat[0]['login'] ?></div>
             <div class="chat_messages_block"></div>
             <div class="chat_down_block">
                 <input class="chat_input_message" type="text" id="message" placeholder="Впишите сообщение" required>

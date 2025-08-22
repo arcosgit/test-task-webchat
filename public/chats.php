@@ -1,18 +1,19 @@
 <?php
+session_start();
 require __DIR__ . "/../vendor/autoload.php"; 
 use App\Models\User;
 if(isset($_POST['logout'])){
-    setcookie("auth_token", '0', time());
-    setcookie("id", '0', time());
-    setcookie("login", '0', expires_or_options: time());
+    unset($_SESSION['auth_token']);
+    unset($_SESSION['id']);
+    unset($_SESSION['login']);
     header('Location: index.php');
     exit();
 }
-if(!isset($_COOKIE["auth_token"])){
+if(!isset($_SESSION['auth_token'])){
     header("Location: index.php");
     exit();
 }
-$users = User::where("id", "!=", $_COOKIE["id"], "id, login")->get();
+$users = User::where("id", "!=", $_SESSION['id'], "id, login")->get();
 ?>
 <!DOCTYPE html>
 <html lang="ru">

@@ -7,13 +7,13 @@ use App\Models\UserToken;
 
 function store(){
     if(isset($_POST['login'], $_POST['email'], $_POST['password'], $_POST['password_confirm'])){
-        $tryFindEmail = User::where('email', '=', $_POST['email'])->get();
-        $tryFindLogin = User::where('login', '=', $_POST['login'])->get();
-        if(count($tryFindLogin) > 0){
+        $try_find_email = User::where('email', '=', $_POST['email'])->get();
+        $try_find_login = User::where('login', '=', $_POST['login'])->get();
+        if(count($try_find_login) > 0){
             $_GET['error_login'] = "Данный логин занят";
             return;
         }
-        if(count($tryFindEmail) > 0){
+        if(count($try_find_email) > 0){
             $_GET['error_email'] = "Данная почта уже зарегистрирована";
             return;
         }
@@ -29,9 +29,9 @@ function store(){
                 'user_id' => $user[0]['id'],
                 'token' => $token
             ]);
-            setcookie("auth_token", $token);
-            setcookie("id", $user[0]['id']);
-            setcookie("login", $user[0]['login']);
+            $_SESSION['auth_token'] = $token;
+            $_SESSION['id'] = $user[0]['id'];
+            $_SESSION['login'] = $user[0]['login'];
             header("Location: chats.php");
             exit();
         }
@@ -76,6 +76,6 @@ store();
         </form>
     </main>
     <script src="assets/js/jquery-3.6.0.min.js"></script>
-    <!-- <script src="/public/assets/js/registration.js"></script> -->
+    <script src="/public/assets/js/registration.js"></script>
 </body>
 </html>

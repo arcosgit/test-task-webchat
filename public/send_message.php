@@ -1,7 +1,8 @@
 <?php
+session_start();
 require __DIR__ . "/../vendor/autoload.php";
 use App\Models\ChatMessage;
-if(!isset($_COOKIE["auth_token"])){
+if(!isset($_SESSION['auth_token'])){
     echo json_encode(["success" => false, "message" => "Вы не авторизованы"]);
     exit();
 }
@@ -12,7 +13,7 @@ if($chat_id == null || $message == null){
 } else {
     ChatMessage::insert([
         'chat_id' => $chat_id,
-        'sender_id' => $_COOKIE["id"],
+        'sender_id' => $_SESSION['id'],
         'message' => $message
     ]);
     echo json_encode(["success"=> true,"message"=> $message, 'chat_id' => $chat_id]);
