@@ -4,6 +4,7 @@ namespace App\Services\DB;
  * @method static bool insert(array $params)
  * @method static self where(string $column, string $operator, string $value, string $columns = "*")
  * @method static self select(string $params = '*')
+ * @method static self orderBy(string $value, string $direction = "ASC")
  * @method static self whereOr(string $column, string $operator, string $value)
  * @method self join(string $relation_table, string $on, string $join = 'INNER')
  * @method static bool delete(string $column, string $operator, string $value)

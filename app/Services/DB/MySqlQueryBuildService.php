@@ -33,8 +33,12 @@ class MySqlQueryBuildService{
             $sql = "SELECT $columns FROM $this->table WHERE $column $operator ? ";
             $this->query .= $sql;
             $this->queryParam[] = $value;
-        } else {
+        } else if($this->query != "" && strpos($this->query, "WHERE")) {
             $sql = "AND $column $operator ? ";
+            $this->query .= $sql;
+            $this->queryParam[] = $value;
+        } else {
+            $sql = "WHERE $column $operator ? ";
             $this->query .= $sql;
             $this->queryParam[] = $value;
         }
@@ -46,6 +50,12 @@ class MySqlQueryBuildService{
         $sql = "OR $column $operator ? ";
         $this->query .= $sql;
         $this->queryParam[] = $value;
+        return $this;
+    }
+
+    public function orderBy(string $value, string $direction = "ASC"): self
+    {
+        $this->query .= "ORDER BY $value $direction";
         return $this;
     }
     public function insert(array $params): bool

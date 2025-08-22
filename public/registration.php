@@ -1,4 +1,5 @@
 <?php
+session_start();
 require __DIR__ . "/../vendor/autoload.php"; 
 
 use App\Models\User;
@@ -30,6 +31,7 @@ function store(){
             ]);
             setcookie("auth_token", $token);
             setcookie("id", $user[0]['id']);
+            setcookie("login", $user[0]['login']);
             header("Location: chats.php");
             exit();
         }

@@ -1,7 +1,13 @@
 <?php
 require __DIR__ . "/../vendor/autoload.php"; 
 use App\Models\User;
-
+if(isset($_POST['logout'])){
+    setcookie("auth_token", '0', time());
+    setcookie("id", '0', time());
+    setcookie("login", '0', expires_or_options: time());
+    header('Location: index.php');
+    exit();
+}
 if(!isset($_COOKIE["auth_token"])){
     header("Location: index.php");
     exit();
@@ -31,6 +37,9 @@ $users = User::where("id", "!=", $_COOKIE["id"], "id, login")->get();
                 </div>
                 <?php endforeach ?>
             </div>
+            <form class="form_logout" method="POST">
+                <button type="submit" name="logout" class="form_btn_logout">Выйти из аккаунта</button>
+            </form>
         </div>
     </main>
     <script src="assets/js/jquery-3.6.0.min.js"></script>
