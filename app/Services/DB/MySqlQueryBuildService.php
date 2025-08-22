@@ -20,10 +20,17 @@ class MySqlQueryBuildService{
             die("Ошибка:" . $e->getMessage());
         }
     }
+
+    public function select(string $params = '*'): self
+    {
+        $this->query = "SELECT $params FROM $this->table ";
+        return $this;
+    }
+
     public function where(string $column, string $operator, string $value, string $columns = "*"): self
     {
         if($this->query == ""){
-            $sql = "SELECT $columns FROM {$this->table} WHERE $column $operator ? ";
+            $sql = "SELECT $columns FROM $this->table WHERE $column $operator ? ";
             $this->query .= $sql;
             $this->queryParam[] = $value;
         } else {
@@ -46,7 +53,7 @@ class MySqlQueryBuildService{
         $keys = implode(", ", array_keys($params));
         $prepareValues = array_fill(0, count($params), "?");
         try{
-            $stmt = $this->connection()->prepare("INSERT INTO {$this->table} ($keys) VALUES (" . implode(", ", $prepareValues) . ")");
+            $stmt = $this->connection()->prepare("INSERT INTO $this->table ($keys) VALUES (" . implode(", ", $prepareValues) . ")");
             $stmt->execute(array_values($params));
             return true;
         } catch(PDOException $e){
@@ -54,14 +61,20 @@ class MySqlQueryBuildService{
         }
     }
 
+    public function join(string $relation_table, string $on, string $join = 'INNER'): self
+    {
+        $this->query .= "$join JOIN $relation_table ON $on ";
+        return $this;
+    }
+
     public function delete(string $column, string $operator, string $value): bool
     {
-        $stmt = $this->connection()->prepare("DELETE FROM {$this->table} WHERE $column $operator ?");
+        $stmt = $this->connection()->prepare("DELETE FROM $this->table WHERE $column $operator ?");
         $stmt->execute([$value]);
         return true;
     }
 
-    public function get()
+    public function get(): array
     {
         $stmt = $this->connection()->prepare($this->query);
         $stmt->execute($this->queryParam);

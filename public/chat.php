@@ -1,3 +1,21 @@
+<?php
+
+use App\Models\Chat;
+
+require __DIR__ . "/../vendor/autoload.php";
+if(!isset($_GET['chatId']) || empty($_GET['chatId'])){
+    header('Location: chats.php');
+}
+// $chat = Chat::where('id', '=', $_GET['chatId'])->get();
+// if($chat[0]['first_user_id'] != $_COOKIE['id'] && $chat[0]['second_user_id'] != $_COOKIE['id']){
+//     header('Location: chats.php');
+// }
+// $chat_with_user_id = $chat[0]['first_user_id'] == $_COOKIE['id'] ? 
+$chat = Chat::select('first_user_id, second_user_id, login')
+        ->join('users', 'chats.first_user_id = users.id AND chats.second_user_id = users.id')->get();
+print_r($chat);
+?>
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -28,6 +46,17 @@
     <script src="assets/js/jquery-3.6.0.min.js"></script>
     <script>
         let chatId = <?= $_GET['chatId'] ?>;
+        $('.chat_btn_send_message').on('click', function(){
+            $.ajax({
+                url: "send_message.php",
+                type: "POST",
+                data: { chat_id: chatId, message: $('.chat_input_message').val()  },
+                success: function(response){
+                    let data = JSON.parse(response);
+                    console.log(data);
+                }
+            });
+        });
     </script>
 </body>
 </html>

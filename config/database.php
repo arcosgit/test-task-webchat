@@ -3,7 +3,6 @@ return [
     "host" => "localhost",
     "dbname" => "webchat",
     "username" => "root",
-    "password" => "MySQL911Dwsebnm+#09",
+    "password" => "111111ABC@%",
     "charset"  => "utf8mb4",
 ];
-// "password" => "111111ABC@%",
